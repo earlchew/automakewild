@@ -1,0 +1,4 @@
+noinst_HEADERS_CKSUM_1_ = 3523949601 7
+noinst_HEADERS_CKSUM_2_ = $(shell find . -maxdepth 1 -name '[a-z]*.h' -printf '%f\n' | sort | cksum)
+noinst_HEADERS = \
+  test.h
