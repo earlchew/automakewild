@@ -79,7 +79,10 @@ $(1).mk:	$$(WILDCARD_SRC)
 $(1).am:
 	rm -f "$$@"
 	{ \
-	  FIND="find . -maxdepth 1 -name '$(3)' -printf '%f\n' | sort" ; \
+	  NAME="'(' -name '$(firstword $(3))' \
+                           $(foreach N,$(wordlist 2,$(words $(3)),$(3)), \
+                           -o -name '$N') ')'" ; \
+	  FIND="find . -maxdepth 1 $$$$NAME -printf '%f\n' | sort" ; \
 	  CKSUM="$$$$FIND | cksum" ; \
 	  printf '%s = %s\n' '$(2)_CKSUM_1_' "$$$$(eval $$$$CKSUM)" ; \
 	  printf '%s = $$$$(shell %s)\n' '$(2)_CKSUM_2_'  "$$$$CKSUM" ; \

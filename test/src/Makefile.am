@@ -39,6 +39,6 @@ check_PROGRAMS = _test
 _test_CFLAGS    =
 _test_LDFLAGS   =
 include _test_c.am
-$(call WILDCARD, _test_c, _test_SOURCES, [a-z]*.c)
+$(call WILDCARD, _test_c, _test_SOURCES, [a-m]*.c [n-z]*.c)
 include _test_h.am
 $(call WILDCARD, _test_h, noinst_HEADERS, [a-z]*.h)

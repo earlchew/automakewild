@@ -1,5 +1,5 @@
 _test_SOURCES_CKSUM_1_ = 1754033192 14
-_test_SOURCES_CKSUM_2_ = $(shell find . -maxdepth 1 -name '[a-z]*.c' -printf '%f\n' | sort | cksum)
+_test_SOURCES_CKSUM_2_ = $(shell find . -maxdepth 1 '(' -name '[a-m]*.c'  -o -name '[n-z]*.c' ')' -printf '%f\n' | sort | cksum)
 _test_SOURCES = \
   main.c \
   test.c
