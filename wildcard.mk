@@ -64,7 +64,7 @@ WILDCARD_SRC = $(top_srcdir)/wildcard.mk
 
 define WILDCARD_
 $$(eval -include $(1).mk)
-$(1).mk:	$$(WILDCARD_SRC)
+$(1).mk:	$$(WILDCARD_SRC) $(wildcard $(1).am)
 	{ \
 	  printf '%sinclude %s\n' '-' '$(1).am' ; \
 	  printf 'Makefile:	$$$$(wildcard %s)\n' '$(1).am' ; \
