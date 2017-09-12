@@ -79,10 +79,13 @@ $(1).mk:	$$(WILDCARD_SRC) $(wildcard $(1).am)
 $(1).am:
 	rm -f "$$@"
 	{ \
-	  NAME="'(' -name '$(firstword $(3))' \
-                           $(foreach N,$(wordlist 2,$(words $(3)),$(3)), \
-                           -o -name '$N') ')'" ; \
-	  FIND="find . -maxdepth 1 $$$$NAME -printf '%f\n' | sort" ; \
+          FIND="$(strip ( : \
+	    $(foreach \
+	        N, \
+	        $(3), \
+	        ; find '$(patsubst %/,%,$(dir $N))' \
+	            -maxdepth 1 -name '$(notdir $N)' -printf '%p\n') ) ) \
+	    | sort" ; \
 	  CKSUM="$$$$FIND | cksum" ; \
 	  printf '%s = %s\n' '$(2)_CKSUM_1_' "$$$$(eval $$$$CKSUM)" ; \
 	  printf '%s = $$$$(shell %s)\n' '$(2)_CKSUM_2_'  "$$$$CKSUM" ; \
