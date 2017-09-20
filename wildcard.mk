@@ -46,7 +46,7 @@ WILDCARD_MK_ := 1
 #    ...
 #    app_CFLAGS = ...
 #    include app_c.am                                        #2
-#    $(call WILDCARD, app_c, app_SOURCES, [a-z]*.c)          #3
+#    $(call WILDCARD_LIB, app_c, app_SOURCES, [a-z]*.c)      #3
 #
 # Line #1 brings the wildcard Makefile fragment into scope when make
 # runs the Makefile.
@@ -58,9 +58,45 @@ WILDCARD_MK_ := 1
 # Line #3 is processed by make and defines the rules and targets to construct
 # and update the app_c.mk and app_c.am files.
 
-WILDCARD = $(eval $(call WILDCARD_,$(strip $(1)),$(strip $(2)),$(strip $(3))))
+WILDCARD_LIB = $(eval \
+    $(call WILDCARD_,$(strip \
+	$(1)),$(strip \
+	$(2)),$(strip \
+	$(3)),$(strip \
+	$(call WILDCARD_LIB_,$(strip $(2))))))
+
+WILDCARD_TESTS = $(eval \
+    $(call WILDCARD_,$(strip \
+	$(1)),$(strip \
+	$(2)),$(strip \
+	$(3)),$(strip \
+	$(call WILDCARD_TESTS_,$(strip \
+	    $(2)),$(strip \
+	    $(subst $$,$$$$,$(strip $(4))))))))
 
 WILDCARD_SRC = $(top_srcdir)/wildcard.mk
+
+define WILDCARD_LIB_
+: LIB ; \
+printf '%s' '$(1) =' ; \
+eval $$$$FIND | sed -e 's/^/  /'  -e '1s/^/ \\\n/' -e '$$$$!s/.*/& \\/' ;
+endef
+
+define WILDCARD_TESTS_
+: TEST ; \
+eval $$$$FIND | \
+{ \
+  while read FILE ; do \
+    printf ' %s \\\n' "$$$${FILE%.*}" ; \
+    printf '\n' ; \
+    printf '%s_SOURCES = %s\n' "$$$${FILE%.*}" "$$$$FILE" ; \
+    printf '%s_LDADD = %s\n' "$$$${FILE%.*}" '$(2)' ; \
+  done ; \
+  printf '\n' ; \
+  printf '%s = \\\n' '$(1)' ; \
+} | sed -n -e '/^ /{H;d;}' -e 'p' -e '$$$${g;s/^\n//;s/ \\$$$$//;p;}' ; \
+printf '\n' ;
+endef
 
 define WILDCARD_
 $$(eval -include $(1).mk)
@@ -85,13 +121,11 @@ $(1).am:
 	        $(3), \
 	        ; find '$(patsubst %/,%,$(dir $N))' \
 	            -maxdepth 1 -name '$(notdir $N)' -printf '%p\n') ) ) \
-	    | sort" ; \
+	    | sed -e 's,^\./,,' | sort" ; \
 	  CKSUM="$$$$FIND | cksum" ; \
 	  printf '%s = %s\n' '$(2)_CKSUM_1_' "$$$$(eval $$$$CKSUM)" ; \
 	  printf '%s = $$$$(shell %s)\n' '$(2)_CKSUM_2_'  "$$$$CKSUM" ; \
-	  printf '%s' '$(2) =' ; \
-	  eval $$$$FIND | \
-	    sed -e 's/^/  /'  -e '1s/^/ \\\n/' -e '$$$$!s/.*/& \\/' ; \
+	  $(strip $(4)) \
 	} > "$$@"
 endef
 
