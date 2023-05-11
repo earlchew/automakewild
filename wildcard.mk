@@ -120,7 +120,7 @@ $(1).am:
 	        N, \
 	        $(3), \
 	        ; find '$(patsubst %/,%,$(dir $N))' \
-	            -maxdepth 1 -name '$(notdir $N)' -printf '%p\n') ) ) \
+	            -maxdepth 1 -name '$(notdir $N)' -print) ) ) \
 	    | sed -e 's,^\./,,' | sort" ; \
 	  CKSUM="$$$$FIND | cksum" ; \
 	  printf '%s = %s\n' '$(2)_CKSUM_1_' "$$$$(eval $$$$CKSUM)" ; \
